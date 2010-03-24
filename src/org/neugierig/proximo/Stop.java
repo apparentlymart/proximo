@@ -253,7 +253,17 @@ public class Stop extends Activity implements View.OnClickListener {
       runNameView.setText(runDisplayName);
       
       TextView predictedTimeView = (TextView) ret.findViewById(R.id.predicted_time);
-      predictedTimeView.setText(prediction.minutes+" min");
+      if (prediction.minutes > 0) {
+          predictedTimeView.setText(prediction.minutes+" min");
+      }
+      else {
+          if (prediction.isDeparting) {
+              predictedTimeView.setText("Departing");
+          }
+          else {
+              predictedTimeView.setText("Arriving");
+          }
+      }
       
 
       return ret;
