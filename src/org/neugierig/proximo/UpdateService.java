@@ -34,7 +34,7 @@ public class UpdateService extends Service {
   private boolean mAwaitingTimeout = false;
 
   // How frequently to poll.
-  private static final int UPDATE_INTERVAL_SECONDS = 20;
+  private static final int UPDATE_INTERVAL_SECONDS = 30;
 
   private AsyncBackend mBackend = new AsyncBackend(this);
 
