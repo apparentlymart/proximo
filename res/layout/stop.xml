@@ -33,15 +33,6 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 />
-      <!-- XXX textColor shouldn't need to be hardcoded white. -->
-      <TextView android:id="@+id/subtitle"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#fff"
-                android:maxLines="2"
-                android:ellipsize="end"
-                />
     </LinearLayout>
 
     <!-- Star widget -->

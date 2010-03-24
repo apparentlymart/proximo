@@ -42,10 +42,10 @@ public class Backend {
     return ProximoBus.parseRuns(queryAPI(ProximoBus.getRunsOnRoutePath(routeId), false));
   }
 
-  ProximoBus.Route fetchRun(String routeId, String runId)
+  ProximoBus.Run fetchRun(String routeId, String runId)
       throws MalformedURLException, IOException, JSONException
   {
-    return ProximoBus.parseRoute(queryAPI(ProximoBus.getRunPath(routeId, runId), false));
+    return ProximoBus.parseRun(queryAPI(ProximoBus.getRunPath(routeId, runId), false));
   }
 
   ProximoBus.Stop[] fetchStopsOnRun(String routeId, String runId)

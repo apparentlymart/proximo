@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+   xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="horizontal"
+   android:layout_width="fill_parent"
+   android:layout_height="wrap_content"
+   android:gravity="top"
+   android:paddingTop="2dip"
+   android:paddingBottom="2dip"
+   android:minHeight="?android:attr/listPreferredItemHeight"
+   >
+
+  <TwoLineListItem
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     >
+    <TextView android:id="@+id/route_name"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="6dip"
+              android:layout_marginTop="6dip"
+              android:textAppearance="?android:attr/textAppearanceLarge"
+              android:maxLines="1"
+              />
+    <TextView android:id="@+id/run_name"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:layout_below="@id/route_name"
+              android:layout_alignLeft="@id/route_name"
+              android:layout_marginBottom="6dip"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:maxLines="1"
+              />
+  </TwoLineListItem>
+
+  <TextView android:id="@+id/predicted_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="6dip"
+            android:layout_marginTop="6dip"
+            android:gravity="top|right"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:maxLines="1"
+             />
+</LinearLayout>
