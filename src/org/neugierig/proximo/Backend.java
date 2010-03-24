@@ -48,6 +48,12 @@ public class Backend {
     return ProximoBus.parsePredictions(queryAPI(ProximoBus.getStopPredictionsByRoutePath(stopId, routeId), forceRefresh));
   }
 
+  ProximoBus.Prediction[] fetchAllPredictionsForStop(String stopId, boolean forceRefresh)
+      throws MalformedURLException, IOException, JSONException
+  {
+    return ProximoBus.parsePredictions(queryAPI(ProximoBus.getStopPredictionsPath(stopId), forceRefresh));
+  }
+
   String queryAPI(String path, boolean reload)
       throws MalformedURLException, IOException
   {

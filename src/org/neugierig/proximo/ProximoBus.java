@@ -114,6 +114,10 @@ class ProximoBus {
     return String.format(Stop.PREDICTIONS_BY_ROUTE_PATH_FORMAT, stopId, URLEncoder.encode(routeId));
   }
 
+  static String getStopPredictionsPath(String stopId) {
+    return String.format(Stop.PREDICTIONS_PATH_FORMAT, URLEncoder.encode(stopId));
+  }
+
   static Route[] parseRoutes(String data) throws JSONException {
     JSONObject res = new JSONObject(data);
     JSONArray array = res.getJSONArray("items");

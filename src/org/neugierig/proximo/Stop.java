@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
 import android.util.Log;
+import java.util.HashMap;
 
 public class Stop extends Activity implements AsyncBackendHelper.Delegate,
                                               View.OnClickListener {
@@ -24,6 +25,9 @@ public class Stop extends Activity implements AsyncBackendHelper.Delegate,
   private StarDBAdapter mStarDB;
   private CheckBox mStarView;
 
+  private HashMap<String, String> mRouteNames = new HashMap<String, String>();
+  private HashMap<String, String> mRunNames = new HashMap<String, String>();
+
   private class PredictionsForStopQuery implements AsyncBackend.Query {
     final String mStopId;
     final String mRouteId;
@@ -34,7 +38,7 @@ public class Stop extends Activity implements AsyncBackendHelper.Delegate,
       mForceRefresh = forceRefresh;
     }
     public Object runQuery(Backend backend) throws Exception {
-      return backend.fetchPredictionsForRouteAtStop(mRouteId, mStopId, mForceRefresh);
+      return backend.fetchAllPredictionsForStop(mStopId, mForceRefresh);
     }
   }
 
