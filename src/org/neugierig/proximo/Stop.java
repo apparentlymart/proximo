@@ -143,4 +143,27 @@ public class Stop extends Activity implements View.OnClickListener {
         break;
     }
   }
+
+  private class RouteQuery implements AsyncBackend.Query {
+    final String mRouteId;
+    RouteQuery(String routeId) {
+      mRouteId = routeId;
+    }
+    public Object runQuery(Backend backend) throws Exception {
+      return backend.fetchRoute(mRouteId);
+    }
+  }
+ 
+  private class RunQuery implements AsyncBackend.Query {
+    final String mRouteId;
+    final String mRunId;
+    RunQuery(String routeId, String runId) {
+      mRouteId = routeId;
+      mRunId = runId;
+    }
+    public Object runQuery(Backend backend) throws Exception {
+      return backend.fetchRun(mRouteId, mRunId);
+    }
+  }
+
 }
