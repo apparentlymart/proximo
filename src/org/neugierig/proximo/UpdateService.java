@@ -49,8 +49,7 @@ public class UpdateService extends Service {
       mForceRefresh = forceRefresh;
     }
     public Object runQuery(Backend backend) throws Exception {
-      return backend.fetchPredictionsForRouteAtStop(mRouteId, mStopId,
-                                                    mForceRefresh);
+      return backend.fetchAllPredictionsForStop(mStopId, mForceRefresh);
     }
   }
 

@@ -24,6 +24,7 @@ class ProximoBus {
   }
 
   public static class Route extends Displayable {
+    static final String PATH_FORMAT = "routes/%s.json";
     static final String RUNS_PATH_FORMAT = "routes/%s/runs.json";
 
     public String id;
@@ -37,6 +38,7 @@ class ProximoBus {
   }
 
   public static class Run extends Displayable {
+    static final String PATH_FORMAT = "routes/%s/runs/%s.json";
     static final String STOPS_PATH_FORMAT = "routes/%s/runs/%s/stops.json";
     public String id;
     public String routeId;
@@ -139,10 +141,18 @@ class ProximoBus {
     return "routes.json";
   }
 
+  static String getRoutePath(String routeId) {
+    return String.format(Route.PATH_FORMAT, URLEncoder.encode(routeId));
+  }
+
   static String getRunsOnRoutePath(String routeId) {
     // FIXME: URLEncode.encode turns " " into "+", but ProximoBus expects "%20".
     // this means that we can't currently support Owl routes, which have ids like "N OWL".
     return String.format(Route.RUNS_PATH_FORMAT, URLEncoder.encode(routeId));
+  }
+
+  static String getRunPath(String routeId, String runId) {
+    return String.format(Run.PATH_FORMAT, URLEncoder.encode(routeId), URLEncoder.encode(runId));
   }
 
   static String getStopsOnRunPath(String routeId, String runId) {
@@ -151,6 +161,10 @@ class ProximoBus {
 
   static String getStopPredictionsByRoutePath(String stopId, String routeId) {
     return String.format(Stop.PREDICTIONS_BY_ROUTE_PATH_FORMAT, stopId, URLEncoder.encode(routeId));
+  }
+
+  static String getStopPredictionsPath(String stopId) {
+    return String.format(Stop.PREDICTIONS_PATH_FORMAT, URLEncoder.encode(stopId));
   }
 
   static Route[] parseRoutes(String data) throws JSONException {
@@ -162,6 +176,11 @@ class ProximoBus {
       routes[i] = Route.fromJsonObject(entry);
     }
     return routes;
+  }
+
+  static Route parseRoute(String data) throws JSONException {
+    JSONObject res = new JSONObject(data);
+    return Route.fromJsonObject(res);
   }
 
   static Run[] parseRuns(String data) throws JSONException {
@@ -182,6 +201,11 @@ class ProximoBus {
       }
     }
     return runs;
+  }
+
+  static Run parseRun(String data) throws JSONException {
+    JSONObject res = new JSONObject(data);
+    return Run.fromJsonObject(res);
   }
 
   static Stop[] parseStops(String data) throws JSONException {

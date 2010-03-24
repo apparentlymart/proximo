@@ -10,6 +10,7 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 import android.util.Log;
+import java.util.HashMap;
 
 public class Stop extends Activity implements View.OnClickListener {
   private String mRouteId;
@@ -23,6 +24,10 @@ public class Stop extends Activity implements View.OnClickListener {
   private StarDBAdapter mStarDB;
   private CheckBox mStarView;
 
+  private HashMap<String, String> mRouteNames = new HashMap<String, String>();
+  private HashMap<String, String> mRunNames = new HashMap<String, String>();
+
+  private AsyncBackend mBackend = new AsyncBackend(this);
   private IUpdateService mService;
 
   @Override
@@ -41,10 +46,13 @@ public class Stop extends Activity implements View.OnClickListener {
     mStopId = extras.getString(ViewState.STOP_ID_KEY);
     mStopName = extras.getString(ViewState.STOP_NAME_KEY);
 
+    // Put the names we already know in the lookup table to save us
+    // a couple of lookups when we come to render the predictions list.
+    mRouteNames.put(mRouteId, mRouteName);
+    mRunNames.put(mRunId, mRunName);
+
     TextView title = (TextView) findViewById(R.id.title);
     title.setText(mStopName);
-    TextView subtitle = (TextView) findViewById(R.id.subtitle);
-    subtitle.setText(mRouteName + ": " + mRunName);
 
     mStarView = (CheckBox) findViewById(R.id.star);
     mStarView.setOnClickListener(this);
@@ -115,9 +123,8 @@ public class Stop extends Activity implements View.OnClickListener {
     ListView list = (ListView) findViewById(R.id.list);
     ListAdapter adapter;
     if (mPredictions.length > 0) {
-      adapter = new ArrayAdapter<ProximoBus.Prediction>(
+      adapter = new PredictionsListAdapter(
           this,
-          android.R.layout.simple_list_item_1,
           mPredictions);
     } else {
       adapter = new ArrayAdapter<String>(
@@ -139,4 +146,121 @@ public class Stop extends Activity implements View.OnClickListener {
         break;
     }
   }
+
+  private class RouteQuery implements AsyncBackend.Query {
+    final String mRouteId;
+    RouteQuery(String routeId) {
+      mRouteId = routeId;
+    }
+    public Object runQuery(Backend backend) throws Exception {
+      return backend.fetchRoute(mRouteId);
+    }
+  }
+ 
+  private class RunQuery implements AsyncBackend.Query {
+    final String mRouteId;
+    final String mRunId;
+    RunQuery(String routeId, String runId) {
+      mRouteId = routeId;
+      mRunId = runId;
+    }
+    public Object runQuery(Backend backend) throws Exception {
+      return backend.fetchRun(mRouteId, mRunId);
+    }
+  }
+
+  private class PredictionsListAdapter extends ArrayAdapter<ProximoBus.Prediction> {
+    private RouteFetchCallback mRouteCallback;
+    private RunFetchCallback mRunCallback;
+
+    public PredictionsListAdapter(Stop context, ProximoBus.Prediction[] objects) {
+      super(context, android.R.layout.simple_list_item_1, objects);
+      this.mRouteCallback = new RouteFetchCallback();
+      this.mRunCallback = new RunFetchCallback();
+    }
+
+    private class RouteFetchCallback implements AsyncBackend.APIResultCallback {
+      public void onAPIResult(Object obj) {
+        ProximoBus.Route route = (ProximoBus.Route) obj;
+        Stop.this.mRouteNames.put(route.id, route.displayName);
+        PredictionsListAdapter.this.notifyDataSetChanged();
+      }
+      public void onException(Exception exn) {
+        // Not the end of the world if we don't get a pretty display name. Ignore.
+      }
+    }
+
+    private class RunFetchCallback implements AsyncBackend.APIResultCallback {
+      public void onAPIResult(Object obj) {
+        ProximoBus.Run run = (ProximoBus.Run) obj;
+        Stop.this.mRunNames.put(run.id, run.displayName);
+        PredictionsListAdapter.this.notifyDataSetChanged();
+      }
+      public void onException(Exception exn) {
+        // Not the end of the world if we don't get a pretty display name. Ignore.
+      }
+    }
+
+    public View getView(int position, View convertView, ViewGroup parent) {
+      View ret;
+
+      if (convertView != null) {
+        ret = convertView;
+      }
+      else {
+        ret = View.inflate(this.getContext(), R.layout.prediction_item, null);
+      }
+
+      ProximoBus.Prediction prediction = getItem(position);
+
+      String routeDisplayName;
+      String runDisplayName;
+
+      if (mRouteNames.containsKey(prediction.routeId)) {
+        routeDisplayName = mRouteNames.get(prediction.routeId);
+      }
+      else {
+        routeDisplayName = null;
+        mBackend.startQuery(new RouteQuery(prediction.routeId), mRouteCallback);
+
+        // Drop an explicit null in the dictionary so we don't fire off two queries for the same item.
+        mRouteNames.put(prediction.routeId, null);
+      }
+      if (routeDisplayName == null) {
+        // Use the routeId as a placeholder until our network fetch completes.
+        routeDisplayName = prediction.routeId;
+      }
+
+      if (mRunNames.containsKey(prediction.runId)) {
+        runDisplayName = mRunNames.get(prediction.runId);
+      }
+      else {
+        runDisplayName = null;
+        mBackend.startQuery(new RunQuery(prediction.routeId, prediction.runId), mRunCallback);
+
+        // Drop an explicit null in the dictionary so we don't fire off two queries for the same item.
+        mRunNames.put(prediction.runId, null);
+      }
+      if (runDisplayName == null) {
+        // Just leave the run name blank until our network fetch completes.
+        runDisplayName = "";
+      }
+
+      TextView routeNameView = (TextView) ret.findViewById(R.id.route_name);
+      routeNameView.setText(routeDisplayName);
+
+      TextView runNameView = (TextView) ret.findViewById(R.id.run_name);
+      runNameView.setText(runDisplayName);
+      
+      TextView predictedTimeView = (TextView) ret.findViewById(R.id.predicted_time);
+      predictedTimeView.setText(prediction.minutes+" min");
+      
+
+      return ret;
+    }
+
+  }
+
+
+
 }
